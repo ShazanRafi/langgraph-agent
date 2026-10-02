@@ -37,16 +37,3 @@ graph.add_edge(START, 'chatnode')
 graph.add_edge('chatnode', END)
 
 chatbot = graph.compile(checkpointer=checkpointer)
-
-thread_id = 1
-while True:
-
-    user_input = input('write here: ')
-
-    if user_input.strip().lower() in ['exit', 'quit', 'bye']:
-        break
-
-    config = {'configurable': {'thread_id': thread_id}}
-    response = chatbot.invoke({'message': HumanMessage(user_input)}, config=config)
-    AIresponse = response['message'][-1].content
-    print("AI: ", AIresponse) 
