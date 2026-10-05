@@ -3,9 +3,10 @@ from langchain_core import prompts, messages
 from langchain_core.messages import AIMessage, SystemMessage, HumanMessage,BaseMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from dotenv import load_dotenv
 from typing import TypedDict, Annotated
+import sqlite3
 
 load_dotenv()
 llm = HuggingFaceEndpoint(
@@ -27,7 +28,8 @@ def chatnode(state: ChatState):
 
     return {'message': [response]}
 
-checkpointer = InMemorySaver()
+conn = sqlite3.connect(database='chatbot.db', check_same_thread=False)
+checkpointer = SqliteSaver(conn=conn)
 
 graph = StateGraph(ChatState)
 
@@ -37,3 +39,10 @@ graph.add_edge(START, 'chatnode')
 graph.add_edge('chatnode', END)
 
 chatbot = graph.compile(checkpointer=checkpointer)
+
+def retrieve_all_thread():
+    all_threads = set()
+    for checkpoint in checkpointer.list(None):
+        all_threads.add(checkpoint.config['configurable']['thread_id'])
+
+    return list(all_threads)

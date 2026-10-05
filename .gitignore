@@ -45,3 +45,8 @@ htmlcov/
 
 # LangChain / LangGraph local data
 .langgraph/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
